@@ -1,4 +1,17 @@
 #!/usr/bin/perl
+#=====================================================================#
+# Program => github_stats.pl (In Perl 5.30)             version 1.0.0 #
+#=====================================================================#
+# Autor         => Fernando "El Pop" Romo          (pop@cofradia.org) #
+# Creation date => 19/Jun/2024                                        #
+#---------------------------------------------------------------------#
+# Info => Simple script to show the repositories info using the       #
+#         GitHub Developer API.                                       #
+#---------------------------------------------------------------------#
+# This code are released under the GPL 3.0 License. Any change must   #
+# be report to the authors                                            #
+#                     (c) 2024 - Fernando Romo                        #
+#=====================================================================#
 use strict;
 use JSON;
 use LWP::UserAgent;
@@ -15,7 +28,7 @@ sub get_stats {
     my ($url,$target) = @_;
     my $json = '';
     my $ua = LWP::UserAgent->new(
-        agent => 'GitStats/1.0',
+        agent => 'GitHubStats/1.0',
         keep_alive => 1,
         env_proxy  => 1,
         ssl_opts => { verify_hostname => 0,
@@ -24,6 +37,7 @@ sub get_stats {
     );
     my $res = $ua->request(
         HTTP::Request->new(GET => $url,
+            # Insert thee Authentication Headers requested by GitHub API
             HTTP::Headers->new('Accept' => 'application/vnd.github+json',
                                'Authorization' => "Bearer $Config{'github.token'}",
                                'X-GitHub-Api-Version' => '2022-11-28'),
@@ -34,8 +48,13 @@ sub get_stats {
         );
     undef $ua;
     return $json;
-}
+} #End get_stats()
 
+#-----------#
+# Main body #
+#-----------#
+
+# Download each repository info (Clones and Views)
 foreach my $project ( @{ $Config{'github.repositories'} } ) {
     foreach my $report (@reports) {
         my $msg_ref = from_json(get_stats("https://api.github.com/repos/$Config{'github.user'}/$project/traffic/$report"));
@@ -51,23 +70,26 @@ foreach my $project ( @{ $Config{'github.repositories'} } ) {
     }
 }
 
+# Report Header
 print '-' x 49 . "\n";
 print '| Project       |     Views     |     Clones    |' . "\n";
 print '|---------------|---------------|---------------|' . "\n";
 print '|        Date   |   C   |   U   |   C   |   U   |' . "\n";
 
+# Detail
 foreach my $project (sort { "\U$a" cmp "\U$b" } keys %resume) {
     print '|' . ('-' x 47) . "\|\n";
     print sprintf("\| %-45s \|\n",$project);
     print '|' . ('-' x 47) . "\|\n";
     foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
         print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
-                      $date, 
+                      $date,
                       $resume{$project}{$date}{views}{count},
                       $resume{$project}{$date}{views}{uniques},
                       $resume{$project}{$date}{clones}{count},
                       $resume{$project}{$date}{clones}{uniques});
     }
+    # Totals
     print '|' . ('-' x 47) . "\|\n";
     print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
                   $totals{$project}{views}{count},
@@ -76,3 +98,5 @@ foreach my $project (sort { "\U$a" cmp "\U$b" } keys %resume) {
                   $totals{$project}{clones}{uniques});
 }
 print '-' x 49 . "\n";
+
+# End Main Body #

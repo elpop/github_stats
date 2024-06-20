@@ -53,30 +53,30 @@ sub get_info {
 
 sub project_summary {
     $project = shift;
-    print '-' x 49 . "\n";
+    print '-' x 47 . "\n";
     my $repo_type = 'Public';
     if ($projects{$project}{private}) {
         $repo_type = 'Private';
     }
-    print sprintf("\| %-33s ( %7s ) \|\n", $project, $repo_type);
-    print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|         Created: %-28s \|\n\|         Updated: %-28s \|\n",
+    print sprintf("\| %-31s ( %7s ) \|\n", $project, $repo_type);
+    print '|' . ('-' x 45) . "\|\n";
+    print sprintf("\|        Created: %-27s \|\n\|        Updated: %-27s \|\n",
                   $projects{$project}{created_at},
                   $projects{$project}{updated_at});
-    print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|  Starts: %-5d   Forks: %-5d   Issues: %-5d \|\n",
+    print '|' . ('-' x 45) . "\|\n";
+    print sprintf("\|  Starts: %-5d  Forks: %-5d  Issues: %-5d \|\n",
                   $projects{$project}{starts},
                   $projects{$project}{forks},
                   $projects{$project}{issues});
     if ( exists($resume{$project}) ) {
         # Detail
-        print '|' . ('-' x 47) . "\|\n";
-        print '|               |     Views     |     Clones    |' . "\n";
-        print '|  Date (Zulu)  |---------------|---------------|' . "\n";
-        print '|               |   C   |   U   |   C   |   U   |' . "\n";    
-        print '|---------------|-------|-------|-------|-------|' . "\n";
+        print '|' . ('-' x 45) . "\|\n";
+        print '|             |     Views     |     Clones    |' . "\n";
+        print '| Date (Zulu) |---------------|---------------|' . "\n";
+        print '|             |   C   |   U   |   C   |   U   |' . "\n";    
+        print '|-------------|-------|-------|-------|-------|' . "\n";
         foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
-            print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
+            print sprintf("\| %10s  \| %5d \| %5d \| %5d \| %5d \|\n",
                           $date,
                           $resume{$project}{$date}{views}{count},
                           $resume{$project}{$date}{views}{uniques},
@@ -84,14 +84,14 @@ sub project_summary {
                           $resume{$project}{$date}{clones}{uniques});
         }
         # Totals
-        print '|---------------|-------|-------|-------|-------|' . "\n";
-        print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
+        print '|-------------|-------|-------|-------|-------|' . "\n";
+        print sprintf("\|      Totals \| %5d \| %5d \| %5d \| %5d \|\n",
                       $totals{$project}{views}{count},
                       $totals{$project}{views}{uniques},
                       $totals{$project}{clones}{count},
                       $totals{$project}{clones}{uniques});
     }
-    print '-' x 49 . "\n\n";
+    print '-' x 47 . "\n\n";
 } # End project_summary()
 
 #-----------#

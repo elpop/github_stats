@@ -76,7 +76,7 @@ foreach my $project ( @projects ) {
 print '-' x 49 . "\n";
 print '| Project       |     Views     |     Clones    |' . "\n";
 print '|---------------|---------------|---------------|' . "\n";
-print '|        Date   |   C   |   U   |   C   |   U   |' . "\n";
+print '|   Date (Zulu) |   C   |   U   |   C   |   U   |' . "\n";
 
 # Detail
 foreach my $project (sort { "\U$a" cmp "\U$b" } keys %resume) {

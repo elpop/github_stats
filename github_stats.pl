@@ -12,20 +12,22 @@
 # be report to the authors                                            #
 #                     (c) 2024 - Fernando Romo                        #
 #=====================================================================#
-use strict;
+#use strict;
 use JSON;
 use LWP::UserAgent;
 use Config::Simple;
+use Data::Dumper;
 
-my %Config;
-Config::Simple->import_from('/etc/github_stats.conf', \%Config) or die Config::Simple->error();
+my $Config = new Config::Simple('/etc/github_stats.conf');
 
 my @reports  = ('clones', 'views');
+my @projects = $Config->param('github.repositories');
+my $user = $Config->param('github.user');
 my %resume = ();
 my %totals = ();
 
 sub get_stats {
-    my ($url,$target) = @_;
+    my $url = shift;
     my $json = '';
     my $ua = LWP::UserAgent->new(
         agent => 'GitHubStats/1.0',
@@ -39,7 +41,7 @@ sub get_stats {
         HTTP::Request->new(GET => $url,
             # Insert thee Authentication Headers requested by GitHub API
             HTTP::Headers->new('Accept' => 'application/vnd.github+json',
-                               'Authorization' => "Bearer $Config{'github.token'}",
+                               'Authorization' => 'Bearer '. $Config->param('github.token'),
                                'X-GitHub-Api-Version' => '2022-11-28'),
             ),
             sub {
@@ -55,9 +57,9 @@ sub get_stats {
 #-----------#
 
 # Download each repository info (Clones and Views)
-foreach my $project ( @{ $Config{'github.repositories'} } ) {
+foreach my $project ( @projects ) {
     foreach my $report (@reports) {
-        my $msg_ref = from_json(get_stats("https://api.github.com/repos/$Config{'github.user'}/$project/traffic/$report"));
+        my $msg_ref = from_json(get_stats("https://api.github.com/repos/$user/$project/traffic/$report"));
         if (ref($msg_ref->{$report}) eq 'ARRAY') {
             for (my $i=0; $i <= (@{ $msg_ref->{$report} } - 1) ; $i++) {
                 my ($timestamp) = split(/T/,$msg_ref->{$report}->[$i]->{timestamp});

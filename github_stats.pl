@@ -71,8 +71,8 @@ sub project_summary {
     print '|' . ('-' x 47) . "\|\n";
     print '|               |     Views     |     Clones    |' . "\n";
     print '|  Date (Zulu)  |---------------|---------------|' . "\n";
-    print '|               |   C   |   U   |   C   |   U   |' . "\n";
-    print '|' . ('-' x 47) . "\|\n";
+    print '|               |   C   |   U   |   C   |   U   |' . "\n";    
+    print '|---------------|-------|-------|-------|-------|' . "\n";
     foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
         print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
                       $date,
@@ -82,7 +82,7 @@ sub project_summary {
                       $resume{$project}{$date}{clones}{uniques});
     }
     # Totals
-    print '|' . ('-' x 47) . "\|\n";
+    print '|---------------|-------|-------|-------|-------|' . "\n";
     print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
                   $totals{$project}{views}{count},
                   $totals{$project}{views}{uniques},

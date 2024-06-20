@@ -58,16 +58,16 @@ sub project_summary {
     if ($projects{$project}{private}) {
         $repo_type = 'Private';
     }
-    print sprintf("\| %-45s \|\n", $project);
+    print sprintf("\| %-33s ( %7s ) \|\n", $project, $repo_type);
     print '|' . ('-' x 47) . "\|\n";
     print sprintf("\|     Created: %-32s \|\n\|     Updated: %-32s \|\n",
                   $projects{$project}{created_at},
                   $projects{$project}{updated_at});
     print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|     Starts: %-5d Forks: %-5d    ( %7s ) \|\n",
+    print sprintf("\|  Starts: %-5d   Forks: %-5d   Issues: %-5d \|\n",
                   $projects{$project}{starts},
                   $projects{$project}{forks},
-                  $repo_type);
+                  $projects{$project}{issues});
     print '|' . ('-' x 47) . "\|\n";
     print '|               |     Views     |     Clones    |' . "\n";
     print '|  Date (Zulu)  |---------------|---------------|' . "\n";
@@ -102,6 +102,7 @@ if (ref($msg_ref->{items}) eq 'ARRAY') {
         $projects{$msg_ref->{items}->[$i]->{name}}{private} = "$msg_ref->{items}->[$i]->{private}";
         $projects{$msg_ref->{items}->[$i]->{name}}{forks} = $msg_ref->{items}->[$i]->{forks_count};
         $projects{$msg_ref->{items}->[$i]->{name}}{starts} = $msg_ref->{items}->[$i]->{stargazers_count};
+        $projects{$msg_ref->{items}->[$i]->{name}}{issues} = $msg_ref->{items}->[$i]->{open_issues_count};
         $projects{$msg_ref->{items}->[$i]->{name}}{created_at} = $msg_ref->{items}->[$i]->{created_at};
         $projects{$msg_ref->{items}->[$i]->{name}}{updated_at} = $msg_ref->{items}->[$i]->{updated_at};
     }

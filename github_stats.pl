@@ -16,17 +16,16 @@
 use JSON;
 use LWP::UserAgent;
 use Config::Simple;
-use Data::Dumper;
 
 my $Config = new Config::Simple('/etc/github_stats.conf');
 
 my @reports  = ('clones', 'views');
-my @projects = $Config->param('github.repositories');
+my %projects = ();
 my $user = $Config->param('github.user');
 my %resume = ();
 my %totals = ();
 
-sub get_stats {
+sub get_info {
     my $url = shift;
     my $json = '';
     my $ua = LWP::UserAgent->new(
@@ -50,16 +49,28 @@ sub get_stats {
         );
     undef $ua;
     return $json;
-} #End get_stats()
+} #End get_info()
 
 #-----------#
 # Main body #
 #-----------#
 
+# Get Repositories from user
+my $msg_ref = from_json(get_info("https://api.github.com/search/repositories?q=user:$user"));
+if (ref($msg_ref->{items}) eq 'ARRAY') {
+    for (my $i=0; $i <= (@{ $msg_ref->{items} } - 1) ; $i++) {
+        $projects{$msg_ref->{items}->[$i]->{name}}{private} = "$msg_ref->{items}->[$i]->{private}";
+        $projects{$msg_ref->{items}->[$i]->{name}}{forks} = $msg_ref->{items}->[$i]->{forks_count};
+        $projects{$msg_ref->{items}->[$i]->{name}}{starts} = $msg_ref->{items}->[$i]->{stargazers_count};
+        $projects{$msg_ref->{items}->[$i]->{name}}{created_at} = $msg_ref->{items}->[$i]->{created_at};
+        $projects{$msg_ref->{items}->[$i]->{name}}{updated_at} = $msg_ref->{items}->[$i]->{updated_at};
+    }
+}
+
 # Download each repository info (Clones and Views)
-foreach my $project ( @projects ) {
+foreach my $project ( sort { "\U$a" cmp "\U$b" } keys %projects ) {
     foreach my $report (@reports) {
-        my $msg_ref = from_json(get_stats("https://api.github.com/repos/$user/$project/traffic/$report"));
+        my $msg_ref = from_json(get_info("https://api.github.com/repos/$user/$project/traffic/$report"));
         if (ref($msg_ref->{$report}) eq 'ARRAY') {
             for (my $i=0; $i <= (@{ $msg_ref->{$report} } - 1) ; $i++) {
                 my ($timestamp) = split(/T/,$msg_ref->{$report}->[$i]->{timestamp});
@@ -72,16 +83,27 @@ foreach my $project ( @projects ) {
     }
 }
 
-# Report Header
-print '-' x 49 . "\n";
-print '| Project       |     Views     |     Clones    |' . "\n";
-print '|---------------|---------------|---------------|' . "\n";
-print '|   Date (Zulu) |   C   |   U   |   C   |   U   |' . "\n";
-
 # Detail
 foreach my $project (sort { "\U$a" cmp "\U$b" } keys %resume) {
+    print '-' x 49 . "\n";
+    my $repo_type = 'Public';
+    if ($projects{$project}{private}) {
+        $repo_type = 'Private';
+    }
+    print sprintf("\| %-45s \|\n", $project);
     print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\| %-45s \|\n",$project);
+    print sprintf("\|     Created: %-32s \|\n\|     Updated: %-32s \|\n",
+                  $projects{$project}{created_at},
+                  $projects{$project}{updated_at});
+    print '|' . ('-' x 47) . "\|\n";
+    print sprintf("\|     Starts: %5d Forks: %5d    ( %7s ) \|\n",
+                  $projects{$project}{starts},
+                  $projects{$project}{forks},
+                  $repo_type);
+    print '|' . ('-' x 47) . "\|\n";
+    print '|               |     Views     |     Clones    |' . "\n";
+    print '|  Date (Zulu)  |---------------|---------------|' . "\n";
+    print '|               |   C   |   U   |   C   |   U   |' . "\n";
     print '|' . ('-' x 47) . "\|\n";
     foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
         print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
@@ -98,7 +120,7 @@ foreach my $project (sort { "\U$a" cmp "\U$b" } keys %resume) {
                   $totals{$project}{views}{uniques},
                   $totals{$project}{clones}{count},
                   $totals{$project}{clones}{uniques});
-}
-print '-' x 49 . "\n";
+    print '-' x 49 . "\n\n";
 
+}
 # End Main Body #

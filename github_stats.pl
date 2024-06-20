@@ -60,7 +60,7 @@ sub project_summary {
     }
     print sprintf("\| %-33s ( %7s ) \|\n", $project, $repo_type);
     print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|     Created: %-32s \|\n\|     Updated: %-32s \|\n",
+    print sprintf("\|         Created: %-28s \|\n\|         Updated: %-28s \|\n",
                   $projects{$project}{created_at},
                   $projects{$project}{updated_at});
     print '|' . ('-' x 47) . "\|\n";
@@ -68,26 +68,29 @@ sub project_summary {
                   $projects{$project}{starts},
                   $projects{$project}{forks},
                   $projects{$project}{issues});
-    print '|' . ('-' x 47) . "\|\n";
-    print '|               |     Views     |     Clones    |' . "\n";
-    print '|  Date (Zulu)  |---------------|---------------|' . "\n";
-    print '|               |   C   |   U   |   C   |   U   |' . "\n";    
-    print '|---------------|-------|-------|-------|-------|' . "\n";
-    foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
-        print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
-                      $date,
-                      $resume{$project}{$date}{views}{count},
-                      $resume{$project}{$date}{views}{uniques},
-                      $resume{$project}{$date}{clones}{count},
-                      $resume{$project}{$date}{clones}{uniques});
+    if ( exists($resume{$project}) ) {
+        # Detail
+        print '|' . ('-' x 47) . "\|\n";
+        print '|               |     Views     |     Clones    |' . "\n";
+        print '|  Date (Zulu)  |---------------|---------------|' . "\n";
+        print '|               |   C   |   U   |   C   |   U   |' . "\n";    
+        print '|---------------|-------|-------|-------|-------|' . "\n";
+        foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
+            print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
+                          $date,
+                          $resume{$project}{$date}{views}{count},
+                          $resume{$project}{$date}{views}{uniques},
+                          $resume{$project}{$date}{clones}{count},
+                          $resume{$project}{$date}{clones}{uniques});
+        }
+        # Totals
+        print '|---------------|-------|-------|-------|-------|' . "\n";
+        print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
+                      $totals{$project}{views}{count},
+                      $totals{$project}{views}{uniques},
+                      $totals{$project}{clones}{count},
+                      $totals{$project}{clones}{uniques});
     }
-    # Totals
-    print '|---------------|-------|-------|-------|-------|' . "\n";
-    print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
-                  $totals{$project}{views}{count},
-                  $totals{$project}{views}{uniques},
-                  $totals{$project}{clones}{count},
-                  $totals{$project}{clones}{uniques});
     print '-' x 49 . "\n\n";
 } # End project_summary()
 

@@ -51,6 +51,46 @@ sub get_info {
     return $json;
 } #End get_info()
 
+sub project_summary {
+    $project = shift;
+    print '-' x 49 . "\n";
+    my $repo_type = 'Public';
+    if ($projects{$project}{private}) {
+        $repo_type = 'Private';
+    }
+    print sprintf("\| %-45s \|\n", $project);
+    print '|' . ('-' x 47) . "\|\n";
+    print sprintf("\|     Created: %-32s \|\n\|     Updated: %-32s \|\n",
+                  $projects{$project}{created_at},
+                  $projects{$project}{updated_at});
+    print '|' . ('-' x 47) . "\|\n";
+    print sprintf("\|     Starts: %-5d Forks: %-5d    ( %7s ) \|\n",
+                  $projects{$project}{starts},
+                  $projects{$project}{forks},
+                  $repo_type);
+    print '|' . ('-' x 47) . "\|\n";
+    print '|               |     Views     |     Clones    |' . "\n";
+    print '|  Date (Zulu)  |---------------|---------------|' . "\n";
+    print '|               |   C   |   U   |   C   |   U   |' . "\n";
+    print '|' . ('-' x 47) . "\|\n";
+    foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
+        print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
+                      $date,
+                      $resume{$project}{$date}{views}{count},
+                      $resume{$project}{$date}{views}{uniques},
+                      $resume{$project}{$date}{clones}{count},
+                      $resume{$project}{$date}{clones}{uniques});
+    }
+    # Totals
+    print '|' . ('-' x 47) . "\|\n";
+    print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
+                  $totals{$project}{views}{count},
+                  $totals{$project}{views}{uniques},
+                  $totals{$project}{clones}{count},
+                  $totals{$project}{clones}{uniques});
+    print '-' x 49 . "\n\n";
+} # End project_summary()
+
 #-----------#
 # Main body #
 #-----------#
@@ -81,46 +121,9 @@ foreach my $project ( sort { "\U$a" cmp "\U$b" } keys %projects ) {
             }
         }
     }
+    project_summary($project);
+    %resume = ();
+    %totals = ();
 }
 
-# Detail
-foreach my $project (sort { "\U$a" cmp "\U$b" } keys %resume) {
-    print '-' x 49 . "\n";
-    my $repo_type = 'Public';
-    if ($projects{$project}{private}) {
-        $repo_type = 'Private';
-    }
-    print sprintf("\| %-45s \|\n", $project);
-    print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|     Created: %-32s \|\n\|     Updated: %-32s \|\n",
-                  $projects{$project}{created_at},
-                  $projects{$project}{updated_at});
-    print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|     Starts: %5d Forks: %5d    ( %7s ) \|\n",
-                  $projects{$project}{starts},
-                  $projects{$project}{forks},
-                  $repo_type);
-    print '|' . ('-' x 47) . "\|\n";
-    print '|               |     Views     |     Clones    |' . "\n";
-    print '|  Date (Zulu)  |---------------|---------------|' . "\n";
-    print '|               |   C   |   U   |   C   |   U   |' . "\n";
-    print '|' . ('-' x 47) . "\|\n";
-    foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
-        print sprintf("\|    %10s \| %5d \| %5d \| %5d \| %5d \|\n",
-                      $date,
-                      $resume{$project}{$date}{views}{count},
-                      $resume{$project}{$date}{views}{uniques},
-                      $resume{$project}{$date}{clones}{count},
-                      $resume{$project}{$date}{clones}{uniques});
-    }
-    # Totals
-    print '|' . ('-' x 47) . "\|\n";
-    print sprintf("\|         Total \| %5d \| %5d \| %5d \| %5d \|\n",
-                  $totals{$project}{views}{count},
-                  $totals{$project}{views}{uniques},
-                  $totals{$project}{clones}{count},
-                  $totals{$project}{clones}{uniques});
-    print '-' x 49 . "\n\n";
-
-}
 # End Main Body #

@@ -1,17 +1,30 @@
 #!/usr/bin/perl
-#=====================================================================#
-# Program => github_stats.pl (In Perl 5.30)             version 1.0.0 #
-#=====================================================================#
-# Autor         => Fernando "El Pop" Romo          (pop@cofradia.org) #
-# Creation date => 19/Jun/2024                                        #
-#---------------------------------------------------------------------#
-# Info => Simple script to show the repositories info using the       #
-#         GitHub Developer API.                                       #
-#---------------------------------------------------------------------#
-# This code are released under the GPL 3.0 License. Any change must   #
-# be report to the authors                                            #
-#                     (c) 2024 - Fernando Romo                        #
-#=====================================================================#
+#======================================================================#
+# Program => github_stats.pl (In Perl 5.30)              version 1.0.0 #
+#======================================================================#
+# Autor         => Fernando "El Pop" Romo           (pop@cofradia.org) #
+# Creation date => 19/Jun/2024                                         #
+#----------------------------------------------------------------------#
+# Info => Simple script to show the repositories info using the        #
+#         GitHub Developer API.                                        #
+#----------------------------------------------------------------------#
+#        This code are released under the GPL 3.0 License.             #
+#                                                                      #
+#                     (c) 2024 - Fernando Romo                         #
+#                                                                      #
+# This program is free software: you can redistribute it and/or modify #
+# it under the terms of the GNU General Public License as published by #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at your option) any later version.                                  #
+#                                                                      #
+# This program is distributed in the hope that it will be useful, but  #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU    #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with this program. If not, see <https://www.gnu.org/licenses/> #
+#======================================================================#
 #use strict;
 use JSON;
 use LWP::UserAgent;
@@ -38,7 +51,7 @@ sub get_info {
     );
     my $res = $ua->request(
         HTTP::Request->new(GET => $url,
-            # Insert thee Authentication Headers requested by GitHub API
+            # Insert the Authentication Headers requested by GitHub API
             HTTP::Headers->new('Accept' => 'application/vnd.github+json',
                                'Authorization' => 'Bearer '. $Config->param('github.token'),
                                'X-GitHub-Api-Version' => '2022-11-28'),
@@ -73,7 +86,7 @@ sub project_summary {
         print '|' . ('-' x 45) . "\|\n";
         print '|             |     Views     |     Clones    |' . "\n";
         print '| Date (Zulu) |---------------|---------------|' . "\n";
-        print '|             |   C   |   U   |   C   |   U   |' . "\n";    
+        print '|             |   C   |   U   |   C   |   U   |' . "\n";
         print '|-------------|-------|-------|-------|-------|' . "\n";
         foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
             print sprintf("\| %10s  \| %5d \| %5d \| %5d \| %5d \|\n",

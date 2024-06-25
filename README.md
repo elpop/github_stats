@@ -63,7 +63,7 @@ Simple script to show the repositories info using the GitHub API
     sudo vim etc/github_stats.conf
     ```
     
-    and change the values acording your user and Github Token:
+    Change the values according your user and Github Access Token:
     
     ```
     [github]

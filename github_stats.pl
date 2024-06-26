@@ -25,7 +25,7 @@
 # You should have received a copy of the GNU General Public License    #
 # along with this program. If not, see <https://www.gnu.org/licenses/> #
 #======================================================================#
-#use strict;
+use strict;
 use JSON;
 use LWP::UserAgent;
 use Config::Simple;
@@ -65,7 +65,7 @@ sub get_info {
 } #End get_info()
 
 sub project_summary {
-    $project = shift;
+    my $project = shift;
     print '-' x 47 . "\n";
     my $repo_type = 'Public';
     if ($projects{$project}{private}) {

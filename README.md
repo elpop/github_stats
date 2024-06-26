@@ -13,23 +13,25 @@ Simple script to show the repositories info using the GitHub API
     ```  
     
 2. Perl Dependencies
-    
+
+    [JSON](https://metacpan.org/pod/JSON)
+
     [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)
     
     [Config::Simple](https://metacpan.org/pod/Config::Simple)
-    
+        
     All the Perl Modules are available via [metacpan](https://metacpan.org) or install them via the "cpan" program in your system. Debian/Ubuntu and Fedora have packages for the required perl modules.
     
     for Fedora/Redhat:
     
     ```
-    sudo dnf install perl-libwww-perl perl-LWP-Protocol-https perl-Config-Simple
+    sudo dnf install perl-JSON perl-libwww-perl perl-LWP-Protocol-https perl-Config-Simple
     ```
     
     for Debian/Ubuntu:
     
     ```
-    sudo apt-get install libwww-perl liblwp-protocol-https-perl libconfig-simple-perl
+    sudo apt-get install libjson-perl libwww-perl liblwp-protocol-https-perl libconfig-simple-perl
     ```
     
     On Mac OS:
@@ -44,7 +46,7 @@ Simple script to show the repositories info using the GitHub API
     Install with CPAN:
     
     ```
-    sudo cpan -i LWP::UserAgent LWP::Protocol::https Config::Simple
+    sudo cpan -i JSON LWP::UserAgent LWP::Protocol::https Config::Simple
     ```
 
 3. Obtain your Github Token

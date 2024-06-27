@@ -26,11 +26,53 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/> #
 #======================================================================#
 use strict;
-use JSON;
-use LWP::UserAgent;
-use Config::Simple;
+use JSON;           # read and write json
+use LWP::UserAgent; # Web user agent class
+use Getopt::Long;   # Handle the arguments passed to the program
+use Config::Simple; # read config file
+
+# Terminal Colors
+use constant {
+    RESET     => "\033[0m",
+    BRIGHT    => "\033[1m",
+    DIM       => "\033[2m",
+    UNDERLINE => "\033[3m",
+    BLINK     => "\033[5m",
+    REVERSE   => "\033[7m",
+    HIDDEN    => "\033[8m",
+
+    FG_BLACK    => "\033[30m",
+    FG_RED      => "\033[31m",
+    FG_GREEN    => "\033[32m",
+    FG_YELLOW   => "\033[33m",
+    FG_BLUE     => "\033[34m",
+    FG_MAGENTA  => "\033[35m",
+    FG_CYAN     => "\033[36m",
+    FG_WHITE    => "\033[37m",
+
+    BG_BLACK    => "\033[40m",
+    BG_RED      => "\033[41m",
+    BG_GREEN    => "\033[42m",
+    BG_YELLOW   => "\033[43m",
+    BG_BLUE     => "\033[44m",
+    BG_MAGENTA  => "\033[45m",
+    BG_CYAN     => "\033[46m",
+    BG_WHITE    => "\033[47m",
+};
+
+my %matrix_options = ('color' => { 'project' => BG_RED    . BRIGHT . FG_WHITE,
+                                   'header'  => BG_WHITE  . BRIGHT . FG_BLACK,
+                                   'info'    => BG_YELLOW . BRIGHT . FG_BLACK,
+                                   'date'    => BG_WHITE  . FG_BLACK,
+                                   'c'       => BG_CYAN   . FG_BLACK,
+                                   'u'       => BG_WHITE  . FG_BLACK, }, );
 
 my $Config = new Config::Simple('/etc/github_stats.conf');
+
+my %options = ();
+GetOptions(\%options,
+           'text',
+);
 
 my @reports  = ('clones', 'views');
 my %projects = ();
@@ -64,7 +106,7 @@ sub get_info {
     return $json;
 } #End get_info()
 
-sub project_summary {
+sub project_summary_text {
     my $project = shift;
     print '-' x 47 . "\n";
     my $repo_type = 'Public';
@@ -105,7 +147,59 @@ sub project_summary {
                       $totals{$project}{clones}{uniques});
     }
     print '-' x 47 . "\n\n";
-} # End project_summary()
+} # End project_summary_text()
+
+sub project_summary_ansi {
+    my $project = shift;
+    my $repo_type = 'Public';
+    if ($projects{$project}{private}) {
+        $repo_type = 'Private';
+    }
+    print sprintf($matrix_options{color}{project} . " %-28s (%7s ) " . RESET . "\n", $project, $repo_type);
+    print sprintf($matrix_options{color}{header} . "    Created: %-27s ". RESET . "\n" .
+                  $matrix_options{color}{header} . "    Updated: %-27s " . RESET . "\n",
+                  $projects{$project}{created_at},
+                  $projects{$project}{updated_at});
+    print sprintf($matrix_options{color}{info} ." Starts: %-5d Forks: %-5d Issues: %-5d" . RESET . "\n",
+                  $projects{$project}{starts},
+                  $projects{$project}{forks},
+                  $projects{$project}{issues});
+    if ( exists($resume{$project}) ) {
+        # Detail
+        print $matrix_options{color}{header} . ' Date (Zulu)      Views         Clones   ' . RESET . "\n";
+        print $matrix_options{color}{header} . '             ' .
+                          $matrix_options{color}{c} . '   C   ' .
+                          $matrix_options{color}{u} . '   U   ' .
+                          $matrix_options{color}{c} . '   C   ' .
+                          $matrix_options{color}{u} . '   U   ' .
+                          RESET . "\n";
+        foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
+            print sprintf($matrix_options{color}{date} . "  %10s " .
+                          $matrix_options{color}{c} . " %5d " .
+                          $matrix_options{color}{u} . " %5d " .
+                          $matrix_options{color}{c} . " %5d " .
+                          $matrix_options{color}{u} . " %5d " .
+                          RESET . "\n",
+                          $date,
+                          $resume{$project}{$date}{views}{count},
+                          $resume{$project}{$date}{views}{uniques},
+                          $resume{$project}{$date}{clones}{count},
+                          $resume{$project}{$date}{clones}{uniques});
+        }
+        # Totals
+        print sprintf($matrix_options{color}{header} . '      Totals ' .
+                      $matrix_options{color}{c} . " %5d " .
+                      $matrix_options{color}{u} . " %5d " .
+                      $matrix_options{color}{c} . " %5d " .
+                      $matrix_options{color}{u} . " %5d " .
+                      RESET . "\n",
+                      $totals{$project}{views}{count},
+                      $totals{$project}{views}{uniques},
+                      $totals{$project}{clones}{count},
+                      $totals{$project}{clones}{uniques});
+    }
+    print "\n";
+} # End project_summary_ansi()
 
 #-----------#
 # Main body #
@@ -138,7 +232,12 @@ foreach my $project ( sort { "\U$a" cmp "\U$b" } keys %projects ) {
             }
         }
     }
-    project_summary($project);
+    if ($options{'text'}) {
+        project_summary_text($project);
+    }
+    else {
+        project_summary_ansi($project);
+    }
     %resume = ();
     %totals = ();
 }

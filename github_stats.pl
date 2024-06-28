@@ -50,6 +50,15 @@ use constant {
     FG_CYAN     => "\033[36m",
     FG_WHITE    => "\033[37m",
 
+    FG_BRIGHT_BLACK    => "\033[90m",
+    FG_BRIGHT_RED      => "\033[91m",
+    FG_BRIGHT_GREEN    => "\033[92m",
+    FG_BRIGHT_YELLOW   => "\033[93m",
+    FG_BRIGHT_BLUE     => "\033[94m",
+    FG_BRIGHT_MAGENTA  => "\033[95m",
+    FG_BRIGHT_CYAN     => "\033[96m",
+    FG_BRIGHT_WHITE    => "\033[97m",
+
     BG_BLACK    => "\033[40m",
     BG_RED      => "\033[41m",
     BG_GREEN    => "\033[42m",
@@ -58,14 +67,29 @@ use constant {
     BG_MAGENTA  => "\033[45m",
     BG_CYAN     => "\033[46m",
     BG_WHITE    => "\033[47m",
+
+    BG_BRIGHT_BLACK    => "\033[100m",
+    BG_BRIGHT_RED      => "\033[101m",
+    BG_BRIGHT_GREEN    => "\033[102m",
+    BG_BRIGHT_YELLOW   => "\033[103m",
+    BG_BRIGHT_BLUE     => "\033[104m",
+    BG_BRIGHT_MAGENTA  => "\033[105m",
+    BG_BRIGHT_CYAN     => "\033[106m",
+    BG_BRIGHT_WHITE    => "\033[107m",
+
 };
 
-my %matrix_options = ('color' => { 'project' => BG_RED    . BRIGHT . FG_WHITE,
-                                   'header'  => BG_WHITE  . BRIGHT . FG_BLACK,
-                                   'info'    => BG_YELLOW . BRIGHT . FG_BLACK,
-                                   'date'    => BG_WHITE  . FG_BLACK,
-                                   'c'       => BG_CYAN   . FG_BLACK,
-                                   'u'       => BG_WHITE  . FG_BLACK, }, );
+my %matrix_options = ('color' => { 'project'  => BG_RED    . BRIGHT . FG_WHITE,
+                                   'header'   => BG_WHITE  . BRIGHT . FG_BLACK,
+                                   'header_2' => BG_BRIGHT_WHITE  . BRIGHT . FG_BLACK,
+                                   'info'     => BG_BRIGHT_YELLOW . BRIGHT . FG_BLACK,
+                                   'date'     => BG_BRIGHT_WHITE  . BRIGHT . FG_BLACK,
+                                   'c'        => BG_BRIGHT_CYAN   . FG_BLACK,
+                                   'u'        => BG_BRIGHT_WHITE  . FG_BLACK,
+                                   'c_header' => BG_CYAN   . FG_BLACK,
+                                   'u_header' => BG_WHITE  . FG_BLACK, }, );
+
+
 
 my $Config = new Config::Simple('/etc/github_stats.conf');
 
@@ -166,12 +190,12 @@ sub project_summary_ansi {
                   $projects{$project}{issues});
     if ( exists($resume{$project}) ) {
         # Detail
-        print $matrix_options{color}{header} . ' Date (Zulu)      Views         Clones   ' . RESET . "\n";
+        print $matrix_options{color}{header_2} . ' Date (Zulu)      Views         Clones   ' . RESET . "\n";
         print $matrix_options{color}{header} . '             ' .
-                          $matrix_options{color}{c} . '   C   ' .
-                          $matrix_options{color}{u} . '   U   ' .
-                          $matrix_options{color}{c} . '   C   ' .
-                          $matrix_options{color}{u} . '   U   ' .
+                          $matrix_options{color}{c_header} . '   C   ' .
+                          $matrix_options{color}{u_header} . '   U   ' .
+                          $matrix_options{color}{c_header} . '   C   ' .
+                          $matrix_options{color}{u_header} . '   U   ' .
                           RESET . "\n";
         foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
             print sprintf($matrix_options{color}{date} . "  %10s " .
@@ -188,10 +212,10 @@ sub project_summary_ansi {
         }
         # Totals
         print sprintf($matrix_options{color}{header} . '      Totals ' .
-                      $matrix_options{color}{c} . " %5d " .
-                      $matrix_options{color}{u} . " %5d " .
-                      $matrix_options{color}{c} . " %5d " .
-                      $matrix_options{color}{u} . " %5d " .
+                      $matrix_options{color}{c_header} . " %5d " .
+                      $matrix_options{color}{u_header} . " %5d " .
+                      $matrix_options{color}{c_header} . " %5d " .
+                      $matrix_options{color}{u_header} . " %5d " .
                       RESET . "\n",
                       $totals{$project}{views}{count},
                       $totals{$project}{views}{uniques},

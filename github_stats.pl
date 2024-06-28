@@ -79,7 +79,7 @@ use constant {
 
 };
 
-my %matrix_options = ('color' => { 'project'  => BG_RED    . BRIGHT . FG_WHITE,
+my %matrix_options = ('color' => { 'project'  => BG_RED    . BRIGHT . FG_BRIGHT_WHITE,
                                    'header'   => BG_WHITE  . BRIGHT . FG_BLACK,
                                    'header_2' => BG_BRIGHT_WHITE  . BRIGHT . FG_BLACK,
                                    'info'     => BG_BRIGHT_YELLOW . BRIGHT . FG_BLACK,

@@ -132,30 +132,30 @@ sub get_info {
 
 sub project_summary_text {
     my $project = shift;
-    print '-' x 47 . "\n";
+    print '-' x 49 . "\n";
     my $repo_type = 'Public';
     if ($projects{$project}{private}) {
         $repo_type = 'Private';
     }
-    print sprintf("\| %-31s ( %7s ) \|\n", $project, $repo_type);
-    print '|' . ('-' x 45) . "\|\n";
-    print sprintf("\|        Created: %-27s \|\n\|        Updated: %-27s \|\n",
+    print sprintf("\| %-33s ( %7s ) \|\n", $project, $repo_type);
+    print '|' . ('-' x 47) . "\|\n";
+    print sprintf("\|        Created: %-29s \|\n\|        Updated: %-29s \|\n",
                   $projects{$project}{created_at},
                   $projects{$project}{updated_at});
-    print '|' . ('-' x 45) . "\|\n";
-    print sprintf("\|  Starts: %-5d  Forks: %-5d  Issues: %-5d \|\n",
+    print '|' . ('-' x 47) . "\|\n";
+    print sprintf("\|   Starts: %-5d  Forks: %-5d  Issues: %-5d  \|\n",
                   $projects{$project}{starts},
                   $projects{$project}{forks},
                   $projects{$project}{issues});
     if ( exists($resume{$project}) ) {
         # Detail
-        print '|' . ('-' x 45) . "\|\n";
-        print '|             |    Visitors   |    Clones     |' . "\n";
-        print '| Date (Zulu) |---------------|---------------|' . "\n";
-        print '|             |   V   |   U   |   C   |   U   |' . "\n";
-        print '|-------------|-------|-------|-------|-------|' . "\n";
+        print '|' . ('-' x 47) . "\|\n";
+        print '|             |    Visitors    |     Clones     |' . "\n";
+        print '| Date (Zulu) |----------------|----------------|' . "\n";
+        print '|             | Count | Unique | Count | Unique |' . "\n";
+        print '|-------------|-------|--------|-------|--------|' . "\n";
         foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
-            print sprintf("\| %10s  \| %5d \| %5d \| %5d \| %5d \|\n",
+            print sprintf("\| %10s  \| %5d \|  %5d \| %5d \|  %5d \|\n",
                           $date,
                           $resume{$project}{$date}{views}{count},
                           $resume{$project}{$date}{views}{uniques},
@@ -163,14 +163,14 @@ sub project_summary_text {
                           $resume{$project}{$date}{clones}{uniques});
         }
         # Totals
-        print '|-------------|-------|-------|-------|-------|' . "\n";
-        print sprintf("\|      Totals \| %5d \| %5d \| %5d \| %5d \|\n",
+        print '|-------------|-------|--------|-------|--------|' . "\n";
+        print sprintf("\|      Totals \| %5d \|  %5d \| %5d \|  %5d \|\n",
                       $totals{$project}{views}{count},
                       $totals{$project}{views}{uniques},
                       $totals{$project}{clones}{count},
                       $totals{$project}{clones}{uniques});
     }
-    print '-' x 47 . "\n\n";
+    print '-' x 49 . "\n\n";
 } # End project_summary_text()
 
 sub project_summary_ansi {
@@ -179,30 +179,30 @@ sub project_summary_ansi {
     if ($projects{$project}{private}) {
         $repo_type = 'Private';
     }
-    print sprintf($matrix_options{color}{project} . " %-28s (%7s ) " . RESET . "\n", $project, $repo_type);
-    print sprintf($matrix_options{color}{header} . "    Created: %-27s ". RESET . "\n" .
-                  $matrix_options{color}{header} . "    Updated: %-27s " . RESET . "\n",
+    print sprintf($matrix_options{color}{project} . " %-30s (%7s ) " . RESET . "\n", $project, $repo_type);
+    print sprintf($matrix_options{color}{header} . "     Created: %-28s ". RESET . "\n" .
+                  $matrix_options{color}{header} . "     Updated: %-28s " . RESET . "\n",
                   $projects{$project}{created_at},
                   $projects{$project}{updated_at});
-    print sprintf($matrix_options{color}{info} ." Starts: %-5d Forks: %-5d Issues: %-5d" . RESET . "\n",
+    print sprintf($matrix_options{color}{info} ."  Starts: %-5d Forks: %-5d Issues: %-5d " . RESET . "\n",
                   $projects{$project}{starts},
                   $projects{$project}{forks},
                   $projects{$project}{issues});
     if ( exists($resume{$project}) ) {
         # Detail
-        print $matrix_options{color}{header_2} . ' Date (Zulu)    Visitors       Clones    ' . RESET . "\n";
-        print $matrix_options{color}{header} . '             ' .
-                          $matrix_options{color}{c_header} . '   V   ' .
-                          $matrix_options{color}{u_header} . '   U   ' .
-                          $matrix_options{color}{c_header} . '   C   ' .
-                          $matrix_options{color}{u_header} . '   U   ' .
+        print $matrix_options{color}{header_2} . '                 Visitors       Clones     ' . RESET . "\n";
+        print $matrix_options{color}{header} . ' Date (Zulu) ' .
+                          $matrix_options{color}{c_header} . ' Count ' .
+                          $matrix_options{color}{u_header} . ' Unique ' .
+                          $matrix_options{color}{c_header} . ' Count ' .
+                          $matrix_options{color}{u_header} . ' Unique ' .
                           RESET . "\n";
         foreach my $date (sort { "\U$a" cmp "\U$b" } keys %{$resume{$project}} ) {
             print sprintf($matrix_options{color}{date} . "  %10s " .
                           $matrix_options{color}{c} . " %5d " .
-                          $matrix_options{color}{u} . " %5d " .
+                          $matrix_options{color}{u} . "  %5d " .
                           $matrix_options{color}{c} . " %5d " .
-                          $matrix_options{color}{u} . " %5d " .
+                          $matrix_options{color}{u} . "  %5d " .
                           RESET . "\n",
                           $date,
                           $resume{$project}{$date}{views}{count},
@@ -213,9 +213,9 @@ sub project_summary_ansi {
         # Totals
         print sprintf($matrix_options{color}{header} . '      Totals ' .
                       $matrix_options{color}{c_header} . " %5d " .
-                      $matrix_options{color}{u_header} . " %5d " .
+                      $matrix_options{color}{u_header} . "  %5d " .
                       $matrix_options{color}{c_header} . " %5d " .
-                      $matrix_options{color}{u_header} . " %5d " .
+                      $matrix_options{color}{u_header} . "  %5d " .
                       RESET . "\n",
                       $totals{$project}{views}{count},
                       $totals{$project}{views}{uniques},

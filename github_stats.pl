@@ -150,7 +150,7 @@ sub project_summary_text {
     if ( exists($resume{$project}) ) {
         # Detail
         print '|' . ('-' x 45) . "\|\n";
-        print '|             |    Visitors   |     Clones    |' . "\n";
+        print '|             |    Visitors   |    Clones     |' . "\n";
         print '| Date (Zulu) |---------------|---------------|' . "\n";
         print '|             |   V   |   U   |   C   |   U   |' . "\n";
         print '|-------------|-------|-------|-------|-------|' . "\n";
@@ -190,7 +190,7 @@ sub project_summary_ansi {
                   $projects{$project}{issues});
     if ( exists($resume{$project}) ) {
         # Detail
-        print $matrix_options{color}{header_2} . ' Date (Zulu)    Visitors        Clones   ' . RESET . "\n";
+        print $matrix_options{color}{header_2} . ' Date (Zulu)    Visitors       Clones    ' . RESET . "\n";
         print $matrix_options{color}{header} . '             ' .
                           $matrix_options{color}{c_header} . '   V   ' .
                           $matrix_options{color}{u_header} . '   U   ' .

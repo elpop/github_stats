@@ -5,6 +5,7 @@ Simple script to show the repositories info using the GitHub API
 
 ![stats text](https://raw.githubusercontent.com/elpop/github_stats/main/github_stats_text.png)
 
+![stats individual](https://raw.githubusercontent.com/elpop/github_stats/main/github_stats_individual.png)
 
 ## Install
 

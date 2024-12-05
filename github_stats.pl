@@ -229,41 +229,60 @@ sub project_summary_ansi {
 # Main body #
 #-----------#
 
+my $find = $ARGV[0];
+my $data ='';
 # Get Repositories from user
-my $msg_ref = from_json(get_info("https://api.github.com/search/repositories?q=user:$user"));
-if (ref($msg_ref->{items}) eq 'ARRAY') {
-    for (my $i=0; $i <= (@{ $msg_ref->{items} } - 1) ; $i++) {
-        $projects{$msg_ref->{items}->[$i]->{name}}{private} = "$msg_ref->{items}->[$i]->{private}";
-        $projects{$msg_ref->{items}->[$i]->{name}}{forks} = $msg_ref->{items}->[$i]->{forks_count};
-        $projects{$msg_ref->{items}->[$i]->{name}}{starts} = $msg_ref->{items}->[$i]->{stargazers_count};
-        $projects{$msg_ref->{items}->[$i]->{name}}{issues} = $msg_ref->{items}->[$i]->{open_issues_count};
-        $projects{$msg_ref->{items}->[$i]->{name}}{created_at} = $msg_ref->{items}->[$i]->{created_at};
-        $projects{$msg_ref->{items}->[$i]->{name}}{updated_at} = $msg_ref->{items}->[$i]->{updated_at};
-    }
+if ($find) {
+    $data = get_info("https://api.github.com/repos/$user/$find");
+}
+else {
+    $data = get_info("https://api.github.com/search/repositories?q=user:$user");
 }
 
-# Download each repository info (Clones and Views)
-foreach my $project ( sort { "\U$a" cmp "\U$b" } keys %projects ) {
-    foreach my $report (@reports) {
-        my $msg_ref = from_json(get_info("https://api.github.com/repos/$user/$project/traffic/$report"));
-        if (ref($msg_ref->{$report}) eq 'ARRAY') {
-            for (my $i=0; $i <= (@{ $msg_ref->{$report} } - 1) ; $i++) {
-                my ($timestamp) = split(/T/,$msg_ref->{$report}->[$i]->{timestamp});
-                $resume{$project}{$timestamp}{$report}{count}   = $msg_ref->{$report}->[$i]->{count};
-                $resume{$project}{$timestamp}{$report}{uniques} = $msg_ref->{$report}->[$i]->{uniques};
-                $totals{$project}{$report}{count}   += $msg_ref->{$report}->[$i]->{count};
-                $totals{$project}{$report}{uniques} += $msg_ref->{$report}->[$i]->{uniques};
-            }
+if ($data) {
+# Get Repositories from user
+    my $msg_ref = from_json($data);
+    if (ref($msg_ref->{items}) eq 'ARRAY') {
+        for (my $i=0; $i <= (@{ $msg_ref->{items} } - 1) ; $i++) {
+            $projects{$msg_ref->{items}->[$i]->{name}}{private} = "$msg_ref->{items}->[$i]->{private}";
+            $projects{$msg_ref->{items}->[$i]->{name}}{forks} = $msg_ref->{items}->[$i]->{forks_count};
+            $projects{$msg_ref->{items}->[$i]->{name}}{starts} = $msg_ref->{items}->[$i]->{stargazers_count};
+            $projects{$msg_ref->{items}->[$i]->{name}}{issues} = $msg_ref->{items}->[$i]->{open_issues_count};
+            $projects{$msg_ref->{items}->[$i]->{name}}{created_at} = $msg_ref->{items}->[$i]->{created_at};
+            $projects{$msg_ref->{items}->[$i]->{name}}{updated_at} = $msg_ref->{items}->[$i]->{updated_at};
         }
     }
-    if ($options{'text'}) {
-        project_summary_text($project);
-    }
     else {
-        project_summary_ansi($project);
+        $projects{$msg_ref->{name}}{private} = $msg_ref->{private};
+        $projects{$msg_ref->{name}}{forks} = $msg_ref->{forks_count};
+        $projects{$msg_ref->{name}}{starts} = $msg_ref->{stargazers_count};
+        $projects{$msg_ref->{name}}{issues} = $msg_ref->{open_issues_count};
+        $projects{$msg_ref->{name}}{created_at} = $msg_ref->{created_at};
+        $projects{$msg_ref->{name}}{updated_at} = $msg_ref->{updated_at};    
     }
-    %resume = ();
-    %totals = ();
+    
+    # Download each repository info (Clones and Views)
+    foreach my $project ( sort { "\U$a" cmp "\U$b" } keys %projects ) {
+        foreach my $report (@reports) {
+            my $msg_ref = from_json(get_info("https://api.github.com/repos/$user/$project/traffic/$report"));
+            if (ref($msg_ref->{$report}) eq 'ARRAY') {
+                for (my $i=0; $i <= (@{ $msg_ref->{$report} } - 1) ; $i++) {
+                    my ($timestamp) = split(/T/,$msg_ref->{$report}->[$i]->{timestamp});
+                    $resume{$project}{$timestamp}{$report}{count}   = $msg_ref->{$report}->[$i]->{count};
+                    $resume{$project}{$timestamp}{$report}{uniques} = $msg_ref->{$report}->[$i]->{uniques};
+                    $totals{$project}{$report}{count}   += $msg_ref->{$report}->[$i]->{count};
+                    $totals{$project}{$report}{uniques} += $msg_ref->{$report}->[$i]->{uniques};
+                }
+            }
+        }
+        if ($options{'text'}) {
+            project_summary_text($project);
+        }
+        else {
+            project_summary_ansi($project);
+        }
+        %resume = ();
+        %totals = ();
+    }
 }
-
 # End Main Body #
